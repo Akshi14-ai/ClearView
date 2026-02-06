@@ -405,9 +405,9 @@
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        text: text,
-                        url: url,
-                        mode: mode
+                        text: document.getElementById('textInput').value,
+                        url: document.getElementById('urlInput')?.value,
+                        mode: getSelectedMode()
                     })
                 });
                 const data = await response.json();
