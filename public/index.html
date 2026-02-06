@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClearView – AI Accessible Reader</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  textarea { width: 100%; height: 150px; margin-bottom: 10px; }
+  button { padding: 10px 15px; }
+  #output { margin-top: 20px; border: 1px solid #ccc; padding: 10px; min-height: 50px; }
+</style>
+</head>
+<body>
+
+<h1>ClearView – AI Accessible Reader</h1>
+
+<textarea id="textInput" placeholder="Paste text here"></textarea>
+<br>
+<select id="modeSelect">
+  <option value="simplify">Simplify</option>
+  <option value="summarize">Summarize</option>
+  <option value="bullets">Bullets</option>
+  <option value="readable">Readable</option>
+</select>
+<br><br>
+<button id="adaptBtn">Adapt with AI</button>
+
+<div id="output">Output will appear here</div>
+
+<script>
+async function processContent() {
+  const text = document.getElementById('textInput').value.trim();
+  const mode = document.getElementById('modeSelect').value;
+
+  if (!text) {
+    alert('Please enter text.');
+    return;
+  }
+
+  document.getElementById('output').innerText = 'Processing...';
+
+  try {
+    const response = await fetch("http://localhost:3000/api/adapt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, mode })
+    });
+
+    const data = await response.json();
+    document.getElementById('output').innerText = data.result || 'No output';
+  } catch (err) {
+    document.getElementById('output').innerText = 'Error connecting to backend.';
+    console.error(err);
+  }
+}
+
+document.getElementById('adaptBtn').addEventListener('click', processContent);
+</script>
+
+</body>
+</html>
+
+
