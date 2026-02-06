@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClearView – AI Accessible Reader</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Lexend:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f6f2fb;
+            --text: #2b2430;
+            --muted: #6b5f6f;
+            --accent: #4b6aff;
+            --accent-2: #7f6ad8;
+            --card: #ffffff;
+            --header-start: #37204f;
+            --header-end: #1f1033;
+            --focus: rgba(75, 106, 255, 0.18);
+            --dark-bg: #1a1420;
+            --dark-card: #2a1f35;
+            --dark-text: #f0eaff;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            line-height: 1.6;
+            transition: background-color 0.25s, color 0.25s;
+        }
+
+        header {
+            background: linear-gradient(90deg, var(--header-start), var(--header-end));
+            color: #fff;
+            padding: 18px 20px;
+            text-align: center;
+            border-radius: 28px;
+            box-shadow: 0 8px 28px rgba(16, 10, 30, 0.18);
+            margin: 12px;
+        }
+
+        .header-inner {
+            max-width: 920px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 2.1rem;
+            font-weight: 800;
+        }
+
+        .brand p {
+            margin: 6px 0 0 0;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .header-actions button {
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: #fff;
+            color: var(--header-start);
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+        }
+
+        .header-actions button.playing {
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            color: #fff;
+        }
+
+        main {
+            max-width: 920px;
+            margin: 10px auto;
+            padding: 20px;
+        }
+
+        h2 {
+            color: var(--header-start);
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1.6rem;
+        }
+
+        textarea,
+        input,
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(106, 90, 205, 0.12);
+            margin-top: 8px;
+            background-color: var(--card);
+            color: var(--text);
+        }
+
+        textarea {
+            min-height: 140px;
+        }
+
+        textarea:focus,
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 8px 26px rgba(75, 106, 255, 0.12);
+        }
+
+        button {
+            padding: 10px 18px;
+            font-size: 0.98rem;
+            margin: 6px 6px 6px 0;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(75, 106, 255, 0.18);
+            transition: 0.15s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(75, 106, 255, 0.22);
+        }
+
+        button.secondary {
+            background: #fff;
+            color: var(--header-start);
+            border: 1px solid rgba(31, 16, 51, 0.12);
+            box-shadow: none;
+        }
+
+        .mode-group .mode-btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(31, 16, 51, 0.12);
+            background: #fff;
+            color: var(--header-start);
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.12s;
+        }
+
+        .mode-group .mode-btn[aria-checked="true"] {
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .output {
+            margin-top: 18px;
+            padding: 20px;
+            border-radius: 12px;
+            background: var(--card);
+            box-shadow: 0 10px 28px rgba(18, 12, 35, 0.06);
+            border-left: 6px solid var(--accent);
+        }
+
+        #originalContainer {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f3f3f6;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 24px;
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--muted);
+        }
+
+        .top-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .left-col {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .right-col {
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .high-contrast {
+            background: #fff !important;
+            color: #000 !important;
+        }
+
+        .high-contrast header {
+            background: #000 !important;
+            color: #fff !important;
+        }
+
+        .high-contrast button.secondary,
+        .high-contrast .mode-group .mode-btn {
+            background: #fff !important;
+            color: #000 !important;
+            border: 1px solid #444;
+        }
+
+        .high-contrast button {
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            color: #fff !important;
+        }
+
+        .dark-mode {
+            background: #1a1420 !important;
+            color: #f0eaff !important;
+        }
+
+        .dark-mode header {
+            background: linear-gradient(90deg, #2a1b32, #1b1033);
+            color: #fff;
+        }
+
+        .dark-mode textarea,
+        .dark-mode input,
+        .dark-mode select {
+            background: #2a1f35;
+            color: #f0eaff;
+            border: 1px solid #3a2a52;
+        }
+
+        .dark-mode .output,
+        .dark-mode #originalContainer {
+            background: #2a1f35;
+            color: #f0eaff;
+            border-left: 6px solid var(--accent);
+        }
+
+        .dark-mode button.secondary {
+            background: #3a2a52;
+            color: #f0eaff;
+            border: 1px solid #5f4be0;
+        }
+
+        .dark-mode h2 {
+            color: #ffffff;
+        }
+
+        .right-controls-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .text-controls {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .text-controls label {
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-inner">
+            <div class="brand">
+                <h1>ClearView</h1>
+                <p>AI-powered accessible reading</p>
+            </div>
+            <div class="header-actions">
+                <button id="readHeaderBtn" title="Read Aloud">🔊 Read Aloud</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <h2>Paste Text or Enter a Link</h2>
+        <label>Website link (optional): <input id="urlInput" placeholder="https://example.com"
+                title="Website Link"></label>
+        <label>Or paste text directly: <textarea id="textInput" placeholder="Paste text here"
+                title="Text Input"></textarea></label>
+
+        <div class="top-row">
+            <div class="left-col">
+                <div class="mode-group">
+                    <button class="mode-btn" data-mode="simplify" role="radio" aria-checked="true"
+                        title="Simplify">Simplify</button>
+                    <button class="mode-btn" data-mode="summarize" role="radio" aria-checked="false"
+                        title="Summarize">Summarize</button>
+                    <button class="mode-btn" data-mode="bullets" role="radio" aria-checked="false"
+                        title="Bullets">Bullets</button>
+                    <button class="mode-btn" data-mode="readable" role="radio" aria-checked="false"
+                        title="Readable">Readable</button>
+                </div>
+                <div>
+                    <label>Font</label>
+                    <select id="fontSelect" title="Select Font">
+                        <option value="inter">Inter</option>
+                        <option value="lexend">Lexend</option>
+                    </select>
+                </div>
+                <div class="text-controls">
+                    <label>Text size</label><input id="textSizeRange" type="range" min="14" max="24" value="16"
+                        title="Text Size">
+                    <label>Line height</label><input id="lineHeightRange" type="range" min="1" max="2" step="0.1"
+                        value="1.6" title="Line Height">
+                </div>
+                <div>
+                    <input type="checkbox" id="showOriginal"><label for="showOriginal" title="Show Original Text">Show
+                        original</label>
+                </div>
+            </div>
+
+            <div class="right-col right-controls-group">
+                <button id="adaptBtn" title="Adapt with AI">Adapt with AI</button>
+                <button class="secondary" onclick="toggleContrast()" title="High Contrast">High Contrast</button>
+                <button class="secondary" onclick="toggleDark()" title="Dark Mode">Dark Mode</button>
+                <div class="text-controls">
+                    <button class="secondary" onclick="increaseText()" title="Increase Text Size">A+</button>
+                    <button class="secondary" onclick="decreaseText()" title="Decrease Text Size">A-</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="output" aria-live="polite">
+            <h2>Accessible Version</h2>
+            <p id="outputText">Output will appear here.</p>
+            <button id="outputReadBtn" onclick="toggleReadAloud()" title="Read Aloud Output">🔊 Read Aloud</button>
+            <div id="originalContainer">
+                <strong>Original text</strong>
+                <div id="originalText" style="margin-top:8px;white-space:pre-wrap;color:var(--muted)"></div>
+            </div>
+            <div id="aiMeta" style="margin-top:8px;color:var(--muted);font-size:0.95rem"></div>
+        </section>
+    </main>
+
+    <footer>ClearView adapts online content using AI.</footer>
+
+    <script>
+
+        /* MODE BUTTONS */
+        function setMode(mode) { document.querySelectorAll('.mode-btn').forEach(b => b.setAttribute('aria-checked', 'false')); document.querySelector(`.mode-btn[data-mode="${mode}"]`)?.setAttribute('aria-checked', 'true'); }
+        function getSelectedMode() { return document.querySelector('.mode-btn[aria-checked="true"]')?.dataset.mode || 'simplify'; }
+        document.querySelectorAll('.mode-btn').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+
+        /* FONT & SIZE */
+        function applyFont() { const f = document.getElementById('fontSelect').value; document.body.style.fontFamily = f === 'lexend' ? "'Lexend', sans-serif" : "'Inter', system-ui, Arial, sans-serif"; }
+        function setBaseSize(v) { document.body.style.fontSize = v + 'px'; }
+        function setLineHeight(v) { document.body.style.lineHeight = v; }
+        function increaseText() { const r = document.getElementById('textSizeRange'); r.value = Math.min(24, Number(r.value) + 1); setBaseSize(r.value); }
+        function decreaseText() { const r = document.getElementById('textSizeRange'); r.value = Math.max(12, Number(r.value) - 1); setBaseSize(r.value); }
+
+        /* DARK / CONTRAST */
+        function toggleDark() { document.body.classList.toggle('dark-mode'); }
+        function toggleContrast() { document.body.classList.toggle('high-contrast'); }
+
+        /* ORIGINAL TOGGLE */
+        function toggleOriginal() { document.getElementById('originalContainer').style.display = document.getElementById('showOriginal').checked ? 'block' : 'none'; }
+        document.getElementById('showOriginal').addEventListener('change', toggleOriginal);
+
+        /* SPEECH */
+        let synth = window.speechSynthesis, utter;
+        function stopSpeaking() { if (synth.speaking) synth.cancel(); }
+        function toggleReadAloud() { const t = document.getElementById('outputText').innerText; if (synth.speaking) stopSpeaking(); else { utter = new SpeechSynthesisUtterance(t); utter.rate = 1; synth.speak(utter); } }
+
+        /* ADAPT BUTTON USING OPENAI */
+        async function processContent() {
+            const url = document.getElementById('urlInput').value.trim();
+            const text = document.getElementById('textInput').value.trim();
+            const mode = getSelectedMode();
+            document.getElementById('originalText').innerText = text || url;
+            document.getElementById('aiMeta').innerText = 'Mode: ' + mode;
+            if (!url && !text) { alert('Enter text or URL'); return; }
+            document.getElementById('outputText').innerText = 'Processing...';
+
+            try {
+                const prompt = `Please ${mode} the following text:\n\n${text || url}`;
+                const response = await fetch("http://localhost:3000/api/adapt", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        url: url,
+                        mode: mode
+                    })
+                });
+                const data = await response.json();
+                const result = data.choices?.[0]?.message?.content || "No output from OpenAI.";
+                document.getElementById('outputText').innerText = result;
+            } catch (e) {
+                const msg = '⚠️ AI backend not accessed.';
+                document.getElementById('outputText').innerText = msg;
+                utter = new SpeechSynthesisUtterance(msg); utter.rate = 1; synth.speak(utter);
+            }
+        }
+        document.getElementById('adaptBtn').addEventListener('click', processContent);
+
+        /* PREFS INIT */
+        window.onload = () => { applyFont(); setBaseSize(document.getElementById('textSizeRange').value); setLineHeight(document.getElementById('lineHeightRange').value); }
+        document.getElementById('fontSelect').addEventListener('change', applyFont);
+        document.getElementById('textSizeRange').addEventListener('input', e => setBaseSize(e.target.value));
+        document.getElementById('lineHeightRange').addEventListener('input', e => setLineHeight(e.target.value));
+
+        /* HOVER TO READ BUTTONS */
+        let hoverReadEnabled = true;
+        function toggleHoverRead() { hoverReadEnabled = !hoverReadEnabled; }
+        const hoverBtn = document.createElement('button');
+        hoverBtn.textContent = 'Toggle Hover Read';
+        hoverBtn.style.marginBottom = '10px';
+        hoverBtn.onclick = toggleHoverRead;
+        document.querySelector('main').prepend(hoverBtn);
+
+        document.querySelectorAll('button, input, select, textarea').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                if (hoverReadEnabled) {
+                    stopSpeaking();
+                    const t = el.title || el.innerText || el.placeholder || '';
+                    if (t) { utter = new SpeechSynthesisUtterance(t); utter.rate = 1; synth.speak(utter); }
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
